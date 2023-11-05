@@ -43,11 +43,6 @@ searchButton.addEventListener('click', function (e) {
 		}
 	}
 })
-
-
-
-
-
 if(window.innerWidth < 768) {
 	sidebar.classList.add('hide');
 } else if(window.innerWidth > 576) {
@@ -112,7 +107,7 @@ document.getElementById("submitGrievance").addEventListener("click", function (e
         return;
     }
     // Verify CAPTCHA
-    if (enteredCaptcha !== captchaDiv){
+    if (enteredCaptcha !== captchaDiv) {
         alert("CAPTCHA is incorrect. Please try again.");
         refreshCaptcha();
         return;

@@ -67,29 +67,90 @@ document.addEventListener("DOMContentLoaded", function () {
         setDarkMode(this.checked);
     });
 });
-// Function to generate a random number within a specified range
-function getRandomNumber(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-// Get the elements that display the numbers in your HTML
-const resolvedElement = document.querySelector('.box-info li:nth-child(1) h3');
-const totalElement = document.querySelector('.box-info li:nth-child(2) h3');
-const pendingElement = document.querySelector('.box-info li:nth-child(3) h3');
-// Generate random numbers for Graviances Resolved, Total Graviances, and Graviances Pending
-const totalGraviances = getRandomNumber(1000, 5000); // Adjust the range as needed
-const resolvedGraviances = getRandomNumber(1000, totalGraviances);
-const pendingGraviances = totalGraviances - resolvedGraviances;
-// Update the HTML elements with the generated numbers
-resolvedElement.textContent = resolvedGraviances;
-totalElement.textContent = totalGraviances;
-pendingElement.textContent = pendingGraviances;
-function processPayment() {
-    // Generate a random total amount between 1 and 100
-    const randomAmount = (Math.random() * 100).toFixed(2);
+document.addEventListener("DOMContentLoaded", function() {
+    // Function to generate a random CAPTCHA
+    function generateCaptcha() {
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        let captcha = "";
+        for (let i = 0; i < 6; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            captcha += characters[randomIndex];
+        }
+        return captcha;
+    }
 
-    // Update the #totalAmount element with the generated random amount
-    document.getElementById('totalAmount').textContent = `Total Amount: $${randomAmount}`;
-    alert('Payment processed successfully!');
-}
+    // Generate and display a random CAPTCHA
+    const captchaText = generateCaptcha();
+    document.getElementById("captcha").textContent = captchaText;
 
+    // Select necessary elements
+    const serviceDropdown = document.getElementById("serviceDropdown");
+    const otherServiceInput = document.getElementById("otherServiceInput");
+    const queryBox = document.getElementById("queryBox");
+    const phoneInput = document.getElementById("phoneNumber");
+    const submitButton = document.getElementById("submitGrievance");
+    const verificationMessage = document.getElementById("verification-message");
 
+    // Add a click event listener to the Submit Grievance button
+    submitButton.addEventListener("click", function(event) {
+        event.preventDefault(); // Prevent the form from being submitted
+
+        // Hide any existing messages
+        verificationMessage.style.display = "none";
+
+        // Check if the form is fully filled
+        if (isFormValid()) {
+            // Check if the entered CAPTCHA matches the generated CAPTCHA
+            if (phoneInput.value === captchaText) {
+                // Display success message
+                displayVerificationMessage("Your query is registered successfully.", "green");
+            } else {
+                // Display CAPTCHA mismatch error message
+                displayVerificationMessage("CAPTCHA mismatch. Please try again.", "red");
+            }
+        } else {
+            // Display a message to fill the form completely
+            displayVerificationMessage("Please fill the form completely.", "red");
+        }
+    });
+
+    serviceDropdown.addEventListener("change", function() {
+        const otherServiceSection = document.querySelector('.other-service-section');
+        if (serviceDropdown.value === "Any Other") {
+            otherServiceSection.style.display = "block"; // Show the "Other Service" section
+        } else {
+            otherServiceSection.style.display = "none"; // Hide the "Other Service" section
+        }
+    });
+
+    // Add an input event listener to the Phone Number input
+    phoneInput.addEventListener("input", function() {
+        // Check if the input is a valid integer
+        const phoneNumber = parseInt(phoneInput.value);
+        if (isNaN(phoneNumber)) {
+            verificationMessage.textContent = "Phone number must be an integer.";
+            verificationMessage.style.color = "red";
+        } else {
+            verificationMessage.textContent = ""; // Clear any previous error message
+        }
+    });
+
+    // Function to check if the form is fully filled
+    function isFormValid() {
+        const selectedService = serviceDropdown.value;
+        const otherService = otherServiceInput.value;
+        const query = queryBox.value;
+        const phoneNumber = phoneInput.value;
+        return (selectedService && ((selectedService !== "Any Other") || (selectedService === "Any Other" && otherService)) && query && phoneNumber);
+    }
+
+    // Function to display the verification message
+    function displayVerificationMessage(message, color) {
+        verificationMessage.textContent = message;
+        verificationMessage.style.color = color;
+        verificationMessage.style.display = "block"; // Show the message
+        verificationMessage.style.fontSize = "24px";
+        verificationMessage.style.textAlign = "center";
+        verificationMessage.style.marginTop = "20px";
+    }
+});
